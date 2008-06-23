@@ -15,6 +15,11 @@ There are 4 kinds of graphs in HTML5.jp.
 With this plugin, you can easily draw graphs using helper methods. 
 Helper methods accepts both simple array data and your original complex model objects.
 
+== Install
+
+  > gem sources -a http://gems.github.com (you only have to do this once)
+  > sudo gem install html5jp_graphs
+
 ==Example
 === Draw a Vertical Bar Chart
 
