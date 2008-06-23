@@ -36,7 +36,7 @@ Add :htmltjp_graphs as a helper in your controllers.
 
   <%= vertical_bar_chart [['accesses', 520, 340, 804, 602], ['clicks', 101, 76, 239, 321]] %>
   
-   or you can use your own model obejct.
+   or you can use your own model obejct (with some methods. Please see RDoc for the requirements).
 
   <%= vertical_bar_chart access_click_summaries %>
  
@@ -64,7 +64,7 @@ You can use all options in HTML5.jp. Note that string options should be wrapped 
 
 For example, to specify the backgroundColor option to a radar chart, write like this.
 
-  <%= line_chart access_click_summaries, :backgroundColor => "'red'" %>
+  <%= radar_chart reviews, :backgroundColor => "'red'" %>
 
 Copyright (c) 2008 Yasuko Ohba (y.ohba@everyleaf.com), released under the apache license
 
