@@ -17,8 +17,11 @@ Helper methods accepts both simple array data and your original complex model ob
 
 == Install
 
-  > gem sources -a http://gems.github.com (you only have to do this once)
-  > sudo gem install nay-html5jp_graphs
+  > git clone git://github.com/nay/html5jp_graphs.git vendor/plugins/html5jp_graphs && rm -rf vendor/plugins/html5jp_graphs/.git
+
+If you use Rails 2.1 or later, you can install with this command.
+
+  > ruby script/plugin install git://github.com/nay/html5jp_graphs.git
 
 ==Example
 === Draw a Vertical Bar Chart
