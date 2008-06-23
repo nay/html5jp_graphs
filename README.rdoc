@@ -37,7 +37,7 @@ Also you can include required files separately.
 * pie chart ... circle.js
 * line chart ... line.js
 
-Add :htmltjp_graphs as a helper in your controllers.
+Then, add :htmltjp_graphs as a helper in your controllers.
 
  class GraphsController < ApplicationController
    helper :html5jp_graphs
