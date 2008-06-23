@@ -25,6 +25,18 @@ If you use Rails 2.1 or later, you can install with this command.
 
 ==Set Up
 
+First of all, you need to include javascripts. You can include these files by using :all option.
+
+ <%= javascript_include_tag :all %>
+ 
+Also you can include required files separately.
+
+* required for all graphs ... excanvas.js, excanvas-compressed.js
+* vertical bar chart ... vbar.js
+* radar chart ... radar.js
+* pie chart ... circle.js
+* line chart ... line.js
+
 Add :htmltjp_graphs as a helper in your controllers.
 
  class GraphsController < ApplicationController
