@@ -1,12 +1,11 @@
 = Html5jpGraphs
 
-Html5jpGraphs is a Rails Plugin for html5jp Graph Libraries. 
+Html5jpGraphs is a Rails Plugin for HTML5.jp Graph Libraries. 
 
+HTML5.jp Graph Libraries are written by futomi, released under Apache License, Version 2.0.
 http://www.html5.jp/library/index.html
 
-JavaScript files under /html5jp are licenced with Apach License. See /htmltjp/COPYING.
-
-There are 4 kinds of graphs in html5jp.
+There are 4 kinds of graphs in HTML5.jp.
 
 * vertical bar chart
 * radar chart
@@ -45,7 +44,7 @@ Helper methods accepts both simple array data and your original complex model ob
 
 == Options
 
-You can use all options in HTML5jp. Note that string options should be wrapped in ' ', or it would be used as a script code.
+You can use all options in HTML5.jp. Note that string options should be wrapped in ' ', or it would be used as a script code.
 
 For example, to specify the backgroundColor option to a radar chart, write like this.
 
