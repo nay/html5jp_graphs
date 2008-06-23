@@ -52,13 +52,13 @@ Add :htmltjp_graphs as a helper in your controllers.
   
   <%= line_chart access_click_summaries %>
 
-== Draw a Pie Chart
+=== Draw a Pie Chart
 
   <%= pie_chart([["very good", 400], ["good", 300], ["bad", 100], ["very bad", 300]]) %>
 
   <%= pie_chart opinions %>
 
-== Options
+=== Options
 
 You can use all options in HTML5.jp. Note that string options should be wrapped in ' ', or it would be used as a script code.
 
