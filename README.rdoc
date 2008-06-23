@@ -17,7 +17,7 @@ Helper methods accepts both simple array data and your original complex model ob
 
 == Install
 
-  > git clone git://github.com/nay/html5jp_graphs.git vendor/plugins/html5jp_graphs && rm -rf vendor/plugins/html5jp_graphs/.git
+  > git clone git://github.com/nay/html5jp_graphs.git vendor/plugins/html5jp_graphs
 
 If you use Rails 2.1 or later, you can install with this command.
 
