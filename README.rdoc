@@ -23,6 +23,14 @@ If you use Rails 2.1 or later, you can install with this command.
 
   > ruby script/plugin install git://github.com/nay/html5jp_graphs.git
 
+==Set Up
+
+Add :htmltjp_graphs as a helper in your controllers.
+
+ class GraphsController < ApplicationController
+   helper :html5jp_graphs
+ end
+
 ==Example
 === Draw a Vertical Bar Chart
 
