@@ -86,8 +86,10 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000001">pie_chart</a>&nbsp;&nbsp;
+      <a href="#M000003">line_chart</a>&nbsp;&nbsp;
+      <a href="#M000004">pie_chart</a>&nbsp;&nbsp;
       <a href="#M000002">radar_chart</a>&nbsp;&nbsp;
+      <a href="#M000001">vertical_bar_chart</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -109,11 +111,121 @@
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000001" class="method-detail">
-        <a name="M000001"></a>
+      <div id="method-M000003" class="method-detail">
+        <a name="M000003"></a>
 
         <div class="method-heading">
-          <a href="#M000001" class="method-signature">
+          <a href="#M000003" class="method-signature">
+          <span class="method-name">line_chart</span><span class="method-args">(resource, options = {}, html_options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Draw a line chart using Html5jp radar chart (<a
+href="http://www.html5.jp/library/graph_line.html">www.html5.jp/library/graph_line.html</a>).
+</p>
+<p>
+ex.
+</p>
+<pre>
+  &lt;%= line_chart [['accesses', 520, 340, 804, 602], ['clicks', 101, 76, 239, 321]] %&gt;
+</pre>
+<p>
+The first argument &#8216;resource&#8217; can be one of the following
+forms.
+</p>
+<ul>
+<li>[&#8216;accesses&#8217;, 520, 340, 804, 602]
+
+</li>
+<li>[[&#8216;accesses&#8217;, 520, 340, 804, 602], [&#8216;clicks&#8217;, 101,
+76, 239, 321]]
+
+</li>
+<li>Any other object which has required methods as follows;
+
+<ul>
+<li>each - to supply record objects.
+
+</li>
+<li>items - If :x option does not exist and your resource object has items
+method, it is called to get :x. You can change the method name by
+:items_method option.
+
+</li>
+<li>scales - If :y option does not exist and your resource object has scales
+method, it is called to get :y. You can change the method name by
+:scales_method option
+
+</li>
+<li>max_scale - Would be used as :yMax option if it exists.
+
+</li>
+<li>min_scale - Would be used as :yMin option if it exists.
+
+</li>
+<li>The record object shoud have methods as follows.
+
+<ul>
+<li>label - Like &#8216;accesses&#8217; in the example. You can use other
+method if you specify :label_method option.
+
+</li>
+<li>values - Like [520, 340, 804, 602] in the example. You can use other method
+if you specify :values_method option.
+
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>
+Additionaly, the following options are available.
+</p>
+<ul>
+<li>:canvas_id - element id of the canvas. Default is &#8216;<a
+href="Html5jpGraphsHelper.html#M000003">line_chart</a>&#8217;. Note that
+all rader charts in one page sould have unique canvas_ids.
+
+</li>
+<li>:width - The width of the canvas. Default is 400.
+
+</li>
+<li>:height - The height of the canvas. Default is 300.
+
+</li>
+<li>All options in <a
+href="http://www.html5.jp/library/graph_line.html">www.html5.jp/library/graph_line.html</a>.
+ex. &#8216;yMax&#8217; or :yMax.
+
+</li>
+</ul>
+<p>
+And you can use html_options for the top level div.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000003-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000003-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/html5jp_graphs_helper.rb, line 86</span>
+86:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">line_chart</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-identifier">html_options</span> = {})
+87:     <span class="ruby-identifier">options</span> = {<span class="ruby-identifier">:width</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">400</span>, <span class="ruby-identifier">:height</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">300</span>, <span class="ruby-identifier">:canvas_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'line_chart'</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>.<span class="ruby-identifier">symbolize_keys</span>)
+88:     <span class="ruby-identifier">output</span> = <span class="ruby-identifier">canvas</span>(<span class="ruby-identifier">options</span>, <span class="ruby-identifier">html_options</span>)
+89:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;\n&quot;</span>
+90:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">line_chart_js</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span>)
+91:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000004" class="method-detail">
+        <a name="M000004"></a>
+
+        <div class="method-heading">
+          <a href="#M000004" class="method-signature">
           <span class="method-name">pie_chart</span><span class="method-args">(resource, options = {}, html_options = {})</span>
           </a>
         </div>
@@ -168,9 +280,9 @@ you specify :color_method option. This is optional.
 Additionaly, the following options are available.
 </p>
 <ul>
-<li>:canvas_id - element id of the canvas. Default is
-&#8216;rader_chart&#8217;. Note that all rader charts in one page sould
-have unique canvas_ids.
+<li>:canvas_id - element id of the canvas. Default is &#8216;<a
+href="Html5jpGraphsHelper.html#M000004">pie_chart</a>&#8217;. Note that all
+rader charts in one page sould have unique canvas_ids.
 
 </li>
 <li>:width - The width of the canvas. Default is 400.
@@ -192,16 +304,16 @@ ex. &#8216;startAngle&#8217; or :startAngle.
 And you can use html_options for the top level div.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000001-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000001-source">
+            onclick="toggleCode('M000004-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000004-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/html5jp_graphs_helper.rb, line 25</span>
-25:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">pie_chart</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-identifier">html_options</span> = {})
-26:     <span class="ruby-identifier">options</span> = {<span class="ruby-identifier">:width</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">400</span>, <span class="ruby-identifier">:height</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">300</span>, <span class="ruby-identifier">:canvas_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'pie_chart'</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>.<span class="ruby-identifier">symbolize_keys</span>)
-27:     <span class="ruby-identifier">output</span> = <span class="ruby-identifier">canvas</span>(<span class="ruby-identifier">options</span>, <span class="ruby-identifier">html_options</span>)
-28:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;\n&quot;</span>
-29:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">pie_chart_js</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span>)
-30:   <span class="ruby-keyword kw">end</span>
+     <span class="ruby-comment cmt"># File lib/html5jp_graphs_helper.rb, line 113</span>
+113:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">pie_chart</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-identifier">html_options</span> = {})
+114:     <span class="ruby-identifier">options</span> = {<span class="ruby-identifier">:width</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">400</span>, <span class="ruby-identifier">:height</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">300</span>, <span class="ruby-identifier">:canvas_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'pie_chart'</span>, <span class="ruby-identifier">:sort</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>.<span class="ruby-identifier">symbolize_keys</span>)
+115:     <span class="ruby-identifier">output</span> = <span class="ruby-identifier">canvas</span>(<span class="ruby-identifier">options</span>, <span class="ruby-identifier">html_options</span>)
+116:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;\n&quot;</span>
+117:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">pie_chart_js</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span>)
+118:   <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -263,7 +375,7 @@ specify :values_method option.
 </li>
 <li>color - If :faceColors option does not exist and your record object has
 color method, it is used for :faceColors. You can change the method name by
-:colors_method option.
+:color_method option.
 
 </li>
 </ul>
@@ -299,13 +411,125 @@ And you can use html_options for the top level div.
             onclick="toggleCode('M000002-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000002-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/html5jp_graphs_helper.rb, line 53</span>
-53:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">radar_chart</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-identifier">html_options</span> = {})
-54:     <span class="ruby-identifier">options</span> = {<span class="ruby-identifier">:width</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">400</span>, <span class="ruby-identifier">:height</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">300</span>, <span class="ruby-identifier">:canvas_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'reader_chart'</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>.<span class="ruby-identifier">symbolize_keys</span>)
-55:     <span class="ruby-identifier">output</span> = <span class="ruby-identifier">canvas</span>(<span class="ruby-identifier">options</span>, <span class="ruby-identifier">html_options</span>)
-56:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;\n&quot;</span>
-57:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">rader_chart_js</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span>)
-58:   <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/html5jp_graphs_helper.rb, line 56</span>
+56:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">radar_chart</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-identifier">html_options</span> = {})
+57:     <span class="ruby-identifier">options</span> = {<span class="ruby-identifier">:width</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">400</span>, <span class="ruby-identifier">:height</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">300</span>, <span class="ruby-identifier">:canvas_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'reader_chart'</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>.<span class="ruby-identifier">symbolize_keys</span>)
+58:     <span class="ruby-identifier">output</span> = <span class="ruby-identifier">canvas</span>(<span class="ruby-identifier">options</span>, <span class="ruby-identifier">html_options</span>)
+59:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;\n&quot;</span>
+60:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">rader_chart_js</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span>)
+61:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000001" class="method-detail">
+        <a name="M000001"></a>
+
+        <div class="method-heading">
+          <a href="#M000001" class="method-signature">
+          <span class="method-name">vertical_bar_chart</span><span class="method-args">(resource, options = {}, html_options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Draw a vertical bar chart using Html5jp vertical bar chart (<a
+href="http://www.html5.jp/library/graph_vbar.html">www.html5.jp/library/graph_vbar.html</a>).
+</p>
+<p>
+ex.
+</p>
+<pre>
+  &lt;%= vertical_bar_chart [['accesses', 520, 340, 804, 602], ['clicks', 101, 76, 239, 321]] %&gt;
+</pre>
+<p>
+The first argument &#8216;resource&#8217; can be one of the following
+forms.
+</p>
+<ul>
+<li>[&#8216;accesses&#8217;, 520, 340, 804, 602]
+
+</li>
+<li>[[&#8216;accesses&#8217;, 520, 340, 804, 602], [&#8216;clicks&#8217;, 101,
+76, 239, 321]]
+
+</li>
+<li>Any other object which has required methods as follows;
+
+<ul>
+<li>each - to supply record objects.
+
+</li>
+<li>items - If :x option does not exist and your resource object has items
+method, it is called to get :x. You can change the method name by
+:items_method option.
+
+</li>
+<li>scales - If :y option does not exist and your resource object has scales
+method, it is called to get :y. You can change the method name by
+:scales_method option
+
+</li>
+<li>max_scale - Would be used as :yMax option if it exists.
+
+</li>
+<li>The record object shoud have methods as follows.
+
+<ul>
+<li>label - Like &#8216;accesses&#8217; in the example. You can use other
+method if you specify :label_method option.
+
+</li>
+<li>values - Like [520, 340, 804, 602] in the example. You can use other method
+if you specify :values_method option.
+
+</li>
+<li>color - If :barColors option does not exist and your record object has
+color method, it is used for :barColors. You can change the method name by
+:color_method option.
+
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>
+Additionaly, the following options are available.
+</p>
+<ul>
+<li>:canvas_id - element id of the canvas. Default is &#8216;<a
+href="Html5jpGraphsHelper.html#M000003">line_chart</a>&#8217;. Note that
+all rader charts in one page sould have unique canvas_ids.
+
+</li>
+<li>:width - The width of the canvas. Default is 400.
+
+</li>
+<li>:height - The height of the canvas. Default is 300.
+
+</li>
+<li>All options in <a
+href="http://www.html5.jp/library/graph_vbar.html">www.html5.jp/library/graph_vbar.html</a>.
+ex. &#8216;backgroundColor&#8217; or :backgroundColor.
+
+</li>
+</ul>
+<p>
+And you can use html_options for the top level div.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000001-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000001-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/html5jp_graphs_helper.rb, line 27</span>
+27:  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">vertical_bar_chart</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-identifier">html_options</span> = {})
+28:     <span class="ruby-identifier">options</span> = {<span class="ruby-identifier">:width</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">400</span>, <span class="ruby-identifier">:height</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">300</span>, <span class="ruby-identifier">:canvas_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'vertical_bar_chart'</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>.<span class="ruby-identifier">symbolize_keys</span>)
+29:     <span class="ruby-identifier">output</span> = <span class="ruby-identifier">canvas</span>(<span class="ruby-identifier">options</span>, <span class="ruby-identifier">html_options</span>)
+30:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;\n&quot;</span>
+31:     <span class="ruby-identifier">output</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">vertical_bar_chart_js</span>(<span class="ruby-identifier">resource</span>, <span class="ruby-identifier">options</span>)
+32:   <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
