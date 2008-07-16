@@ -27,7 +27,7 @@ If you use Rails 2.1 or later, you can install with this command.
 
 First of all, you need to include javascripts. You can include these files by using :all option.
 
- <%= javascript_include_tag :all %>
+ &lt;%= javascript_include_tag :all %&gt;
  
 Also you can include required files separately.
 
