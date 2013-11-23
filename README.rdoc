@@ -15,13 +15,13 @@ There are 4 kinds of graphs in HTML5.jp.
 With this plugin, you can easily draw graphs using helper methods. 
 Helper methods accepts both simple array data and your original complex model objects.
 
+Note you need jQuery or prototype.js.
+
 == Install
 
-  > git clone git://github.com/nay/html5jp_graphs.git vendor/plugins/html5jp_graphs
+Add html5jp_graphs in your GemFile for Bundler.
 
-If you use Rails 2.1 or later, you can install with this command.
-
-  > ruby script/plugin install git://github.com/nay/html5jp_graphs.git
+  gem 'html5jp_graphs'
 
 ==Setup
 
