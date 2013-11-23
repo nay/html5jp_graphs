@@ -213,14 +213,24 @@ module Html5jpGraphsHelper
 
   
   def draw(class_name, canvas_id, records, graph_options)
+    script = <<-EOS
+    var rc = new html5jp.graph.#{class_name}("#{canvas_id}");
+    if( ! rc ) { return; }
+    var records = #{to_js_value(records)};
+    var options = #{options_to_json(graph_options)};
+    rc.draw(records, options);
+EOS
+
     javascript_tag <<-EOS
-Event.observe(window, 'load', function() {
-  var rc = new html5jp.graph.#{class_name}("#{canvas_id}");
-  if( ! rc ) { return; }
-  var records = #{to_js_value(records)};
-  var options = #{options_to_json(graph_options)};
-  rc.draw(records, options);
-});
+if (jQuery) {
+  jQuery(function(){
+#{script}
+  })
+} else {
+  Event.observe(window, 'load', function() {
+#{script}
+  })
+}
     EOS
   end
   
