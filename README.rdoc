@@ -25,19 +25,11 @@ Add html5jp_graphs in your GemFile for Bundler.
 
 ==Setup
 
-First of all, you need to include javascripts. You can include these files by using :all option.
+You need to include html5jp_graphs.js. Add this line to the application.js.
 
- <%= javascript_include_tag :all %>
- 
-Also you can include required files separately.
+  //= require html5jp_graphs
 
-* required for all graphs ... excanvas.js, excanvas-compressed.js
-* vertical bar chart ... vbar.js
-* radar chart ... radar.js
-* pie chart ... circle.js
-* line chart ... line.js
-
-Then, add :htmltjp_graphs as a helper in your controllers.
+Also you need to add :htmltjp_graphs as a helper in your controllers.
 
  class GraphsController < ApplicationController
    helper :html5jp_graphs
@@ -78,5 +70,4 @@ For example, to specify the backgroundColor option to a radar chart, write like 
 
   <%= radar_chart reviews, :backgroundColor => "'red'" %>
 
-Copyright (c) 2008 Yasuko Ohba (y.ohba@everyleaf.com), released under the apache license
-
+Copyright (c) 2008-2013 Yasuko Ohba (y.ohba@everyleaf.com), released under the apache license
