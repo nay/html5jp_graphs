@@ -1,4 +1,4 @@
-// Copyright 2007 futomi  http://www.html5.jp/
+// Copyright 2007-2009 futomi  http://www.html5.jp/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// radar.js v1.0.2
 
 if( typeof html5jp == 'undefined' ) {
 	html5jp = new Object();
@@ -25,17 +27,19 @@ if( typeof html5jp.graph == 'undefined' ) {
 html5jp.graph.radar = function (id) {
 	var elm = document.getElementById(id);
 	if(! elm) { return; }
-	if(elm.nodeName != "CANVAS") { return; }
-	if(elm.parentNode.nodeName != "DIV") { return; };
-	this.canvas = elm;
+	if( ! elm.nodeName.match(/^CANVAS$/i) ) { return; }
+	if( ! elm.parentNode.nodeName.match(/^DIV$/i) ) { return; };
 	/* CANVAS要素 */
-	if ( ! this.canvas ){ return; }
-	if ( ! this.canvas.getContext ){ return; }
+	if ( ! elm.getContext ){ return; }
+	this.canvas = elm;
 	/* 2D コンテクストの生成 */
 	this.ctx = this.canvas.getContext('2d');
 	this.canvas.style.margin = "0";
 	this.canvas.parentNode.style.position = "relative";
 	this.canvas.parentNode.style.padding = "0";
+	/* CANVAS要素の親要素となるDIV要素の幅と高さをセット */
+	this.canvas.parentNode.style.width = this.canvas.width + "px";
+	this.canvas.parentNode.style.height = this.canvas.height + "px";
 };
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 * 描画
@@ -115,11 +119,11 @@ html5jp.graph.radar.prototype.draw = function(items, inparams) {
 		cpos.r = Math.min(this.canvas.width, this.canvas.height) * 0.7 / 2
 		cpos.x = this.canvas.height * 0.1 + cpos.r;
 	}
-	/* 項目の数（最大10個）*/
+	/* 項目の数（最大10個） */
 	var item_num = items.length;
 	if(item_num > 10) { item_num = 10; }
 	params.itemNum = item_num;
-	/* 指標の最大数を算出（多角形の角数） 最小3角・最大24角*/
+	/* 指標の最大数を算出（多角形の角数） 最小3角・最大24角 */
 	var angle_num = 0;
 	for(var i=0; i<items.length; i++) {
 		var n = items[i].length;
@@ -257,12 +261,12 @@ html5jp.graph.radar.prototype._draw_legend = function(items, params, cpos) {
 		this.ctx.fillStyle = params.cBackgroundColor;
 		this.ctx.fill();
 		/* 記号（塗り） */
-		this._make_path_legend_mark(lpos.x, lpos.y, s.h, s.h);
+		//this._make_path_legend_mark(lpos.x, lpos.y, s.h, s.h);
 		this.ctx.fillStyle = params.faceColors[i];
 		this.ctx.globalAlpha = params.faceAlpha;
 		this.ctx.fill();
 		/* 枠線 */
-		this._make_path_legend_mark(lpos.x, lpos.y, s.h, s.h);
+		//this._make_path_legend_mark(lpos.x, lpos.y, s.h, s.h);
 		this.ctx.strokeStyle = params.faceColors[i];
 		this.ctx.globalAlpha = params.borderAlpha;
 		this.ctx.stroke();
@@ -332,7 +336,7 @@ html5jp.graph.radar.prototype._draw_radar_chart = function(params, cpos, axis_an
 	this.ctx.fillStyle = color;
 	this.ctx.fill();
 	/* チャート境界線を引く */
-	this._make_path_for_radar_chart(params, cpos, axis_angles, values);
+	//this._make_path_for_radar_chart(params, cpos, axis_angles, values);
 	this.ctx.globalAlpha = params.borderAlpha;
 	this.ctx.lineWidth = params.borderWidth;
 	this.ctx.strokeStyle = color;
