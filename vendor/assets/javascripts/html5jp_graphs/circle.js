@@ -1,4 +1,4 @@
-// Copyright 2007 futomi  http://www.html5.jp/
+// Copyright 2007-2009 futomi  http://www.html5.jp/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// circle.js v1.0.2
 
 if( typeof html5jp == 'undefined' ) {
 	html5jp = new Object();
@@ -25,17 +27,19 @@ if( typeof html5jp.graph == 'undefined' ) {
 html5jp.graph.circle = function (id) {
 	var elm = document.getElementById(id);
 	if(! elm) { return; }
-	if(elm.nodeName != "CANVAS") { return; }
-	if(elm.parentNode.nodeName != "DIV") { return; };
-	this.canvas = elm;
+	if( ! elm.nodeName.match(/^CANVAS$/i) ) { return; }
+	if( ! elm.parentNode.nodeName.match(/^DIV$/i) ) { return; };
 	/* CANVAS要素 */
-	if ( ! this.canvas ){ return; }
-	if ( ! this.canvas.getContext ){ return; }
+	if ( ! elm.getContext ){ return; }
+	this.canvas = elm;
 	/* 2D コンテクストの生成 */
 	this.ctx = this.canvas.getContext('2d');
 	this.canvas.style.margin = "0";
 	this.canvas.parentNode.style.position = "relative";
 	this.canvas.parentNode.style.padding = "0";
+	/* CANVAS要素の親要素となるDIV要素の幅と高さをセット */
+	this.canvas.parentNode.style.width = this.canvas.width + "px";
+	this.canvas.parentNode.style.height = this.canvas.height + "px";
 };
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 * 描画
@@ -130,7 +134,7 @@ html5jp.graph.circle.prototype.draw = function(items, inparams) {
 	var sum = 0;
 	for(var i=0; i<item_num; i++) {
 		var n = items[i][1];
-		if( isNaN(n) || n <=0 ) {
+		if( isNaN(n) || n <0 ) {
 			throw new Error('invalid graph item data.' + n);
 		}
 		sum += n;
@@ -156,94 +160,101 @@ html5jp.graph.circle.prototype.draw = function(items, inparams) {
 		var rad = this._degree2radian(360*r);
 		/* 円弧終点角度 */
 		endAngle = startAngle + rad;
-		/* 円弧を描画 */
-		this.ctx.beginPath();
-		this.ctx.moveTo(cpos.x,cpos.y);
-		this.ctx.lineTo(
-			cpos.x + cpos.r * Math.cos(startAngle),
-			cpos.y + cpos.r * Math.sin(startAngle)
-		);
-		this.ctx.arc(cpos.x, cpos.y, cpos.r, startAngle, endAngle, false);
-		this.ctx.closePath();
 		/* 円グラフの色を特定 */
 		var rgb = colors[i];
 		var rgbo = this._csscolor2rgb(items[i][2]);
 		if(rgbo) {
 			rgb = rgbo.r + "," + rgbo.g + "," + rgbo.b;
 		}
-		/* 円グラフのグラデーションをセット */
-		var radgrad = this.ctx.createRadialGradient(cpos.x,cpos.y,0,cpos.x,cpos.y,cpos.r);
-		radgrad.addColorStop(0, "rgba(" + rgb + ",1)");
-		radgrad.addColorStop(0.7, "rgba(" + rgb + ",0.85)");
-		radgrad.addColorStop(1, "rgba(" + rgb + ",0.75)");
-		this.ctx.fillStyle = radgrad;
-		this.ctx.fill();
-		/* 円弧の枠線 */
-		if(params.border == true) {
-			this.ctx.stroke();
-		}
-		/* キャプション */
-		var drate;
-		var fontSize;
-		if(r <= 0.03) {
-			drate = 1.1;
-		} else if(r <= 0.05) {
-			drate = 0.9;
-		} else if(r <= 0.1) {
-			drate = 0.8;
-		} else if(r <= 0.15) {
-			drate = 0.7;
-		} else {
-			drate = 0.6;
-		}
-		var cp = {
-			x: cpos.x + (cpos.r * drate) * Math.cos( (startAngle + endAngle) / 2 ),
-			y: cpos.y + (cpos.r * drate) * Math.sin( (startAngle + endAngle) / 2 )
-		};
-		var div = document.createElement('DIV');
-		if(r <= 0.05) {
-			if(params.captionRate == true) {
-				div.appendChild( document.createTextNode( p + "%") );
+		/* */
+		if(n > 0) {
+			/* 円弧を描画 */
+			this.ctx.beginPath();
+			if(p >= 100) {	// for excanvas
+				this.ctx.arc(cpos.x, cpos.y, cpos.r, 0, Math.PI*2, false);
+			} else {
+				this.ctx.moveTo(cpos.x,cpos.y);
+				this.ctx.lineTo(
+					cpos.x + cpos.r * Math.cos(startAngle),
+					cpos.y + cpos.r * Math.sin(startAngle)
+				);
+				this.ctx.arc(cpos.x, cpos.y, cpos.r, startAngle, endAngle, false);
 			}
-		} else {
-			if(params.caption == true) {
-				div.appendChild( document.createTextNode(cap) );
-				if(params.captionNum == true || params.captionRate == true) {
-					div.appendChild( document.createElement('BR') );
+			this.ctx.closePath();
+			/* 円グラフのグラデーションをセット */
+			var radgrad = this.ctx.createRadialGradient(cpos.x,cpos.y,0,cpos.x,cpos.y,cpos.r);
+			radgrad.addColorStop(0, "rgba(" + rgb + ",1)");
+			radgrad.addColorStop(0.7, "rgba(" + rgb + ",0.85)");
+			radgrad.addColorStop(1, "rgba(" + rgb + ",0.75)");
+			this.ctx.fillStyle = radgrad;
+			this.ctx.fill();
+			/* 円弧の枠線 */
+			if(params.border == true) {
+				this.ctx.stroke();
+			}
+			/* キャプション */
+			var drate;
+			var fontSize;
+			if(r <= 0.03) {
+				drate = 1.1;
+			} else if(r <= 0.05) {
+				drate = 0.9;
+			} else if(r <= 0.1) {
+				drate = 0.8;
+			} else if(r <= 0.15) {
+				drate = 0.7;
+			} else {
+				drate = 0.6;
+			}
+			var cp = {
+				x: cpos.x + (cpos.r * drate) * Math.cos( (startAngle + endAngle) / 2 ),
+				y: cpos.y + (cpos.r * drate) * Math.sin( (startAngle + endAngle) / 2 )
+			};
+			var div = document.createElement('DIV');
+			if(r <= 0.05) {
+				if(params.captionRate == true) {
+					div.appendChild( document.createTextNode( p + "%") );
+				}
+			} else {
+				if(params.caption == true) {
+					div.appendChild( document.createTextNode(cap) );
+					if(params.captionNum == true || params.captionRate == true) {
+						div.appendChild( document.createElement('BR') );
+					}
+				}
+				if(params.captionRate == true) {
+					div.appendChild( document.createTextNode( p + "%" ) );
+				}
+				if(params.captionNum == true) {
+					var numCap = n;
+					if(params.caption == true || params.captionRate == true) {
+						numCap = "(" + numCap + ")";
+					}
+					div.appendChild( document.createTextNode( numCap ) );
 				}
 			}
-			if(params.captionRate == true) {
-				div.appendChild( document.createTextNode( p + "%" ) );
-			}
-			if(params.captionNum == true) {
-				var numCap = n;
-				if(params.caption == true || params.captionRate == true) {
-					numCap = "(" + numCap + ")";
+			div.style.position = 'absolute';
+			div.style.textAlign = 'center';
+			div.style.color = params.captionColor;
+			div.style.fontSize = params.fontSize;
+			div.style.fontFamily = params.fontFamily;
+			div.style.margin = "0";
+			div.style.padding = "0";
+			div.style.visible = "hidden";
+			if( params.textShadow == true ) {
+				var dif = [ [ 0,  1], [ 0, -1], [ 1,  0], [ 1,  1], [ 1, -1], [-1,  0], [-1,  1], [-1, -1] ];
+				for(var j=0; j<8; j++) {
+					var s = div.cloneNode(true);
+					this.canvas.parentNode.appendChild(s);
+					s.style.color = "black";
+					s.style.left = (parseFloat(cp.x - s.offsetWidth / 2 + dif[j][0])).toString() + "px";
+					s.style.top = (cp.y - s.offsetHeight / 2 + dif[j][1]).toString() + "px";
 				}
-				div.appendChild( document.createTextNode( numCap ) );
 			}
+			this.canvas.parentNode.appendChild(div);
+			div.style.left = (cp.x - div.offsetWidth / 2).toString() + "px";
+			div.style.top = (cp.y - div.offsetHeight / 2).toString() + "px";
 		}
-		div.style.position = 'absolute';
-		div.style.textAlign = 'center';
-		div.style.color = params.captionColor;
-		div.style.fontSize = params.fontSize;
-		div.style.fontFamily = params.fontFamily;
-		div.style.margin = "0";
-		div.style.padding = "0";
-		div.style.visible = "hidden";
-		if( params.textShadow == true ) {
-			var dif = [ [ 0,  1], [ 0, -1], [ 1,  0], [ 1,  1], [ 1, -1], [-1,  0], [-1,  1], [-1, -1] ];
-			for(var j=0; j<8; j++) {
-				var s = div.cloneNode(true);
-				this.canvas.parentNode.appendChild(s);
-				s.style.color = "black";
-				s.style.left = (parseFloat(cp.x - s.offsetWidth / 2 + dif[j][0])).toString() + "px";
-				s.style.top = (cp.y - s.offsetHeight / 2 + dif[j][1]).toString() + "px";
-			}
-		}
-		this.canvas.parentNode.appendChild(div);
-		div.style.left = (cp.x - div.offsetWidth / 2).toString() + "px";
-		div.style.top = (cp.y - div.offsetHeight / 2).toString() + "px";
 		/* 凡例 */
 		if(params.legend == true) {
 			/* 文字 */

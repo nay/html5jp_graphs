@@ -1,4 +1,4 @@
-// Copyright 2007 futomi  http://www.html5.jp/
+// Copyright 2007-2009 futomi  http://www.html5.jp/
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// line.js v1.0.2
 
 if( typeof html5jp == 'undefined' ) {
 	html5jp = new Object();
@@ -25,17 +27,19 @@ if( typeof html5jp.graph == 'undefined' ) {
 html5jp.graph.line = function (id) {
 	var elm = document.getElementById(id);
 	if(! elm) { return; }
-	if(elm.nodeName != "CANVAS") { return; }
-	if(elm.parentNode.nodeName != "DIV") { return; };
-	this.canvas = elm;
+	if( ! elm.nodeName.match(/^CANVAS$/i) ) { return; }
+	if( ! elm.parentNode.nodeName.match(/^DIV$/i) ) { return; };
 	/* CANVAS要素 */
-	if ( ! this.canvas ){ return; }
-	if ( ! this.canvas.getContext ){ return; }
+	if ( ! elm.getContext ){ return; }
+	this.canvas = elm;
 	/* 2D コンテクストの生成 */
 	this.ctx = this.canvas.getContext('2d');
 	this.canvas.style.margin = "0";
 	this.canvas.parentNode.style.position = "relative";
 	this.canvas.parentNode.style.padding = "0";
+	/* CANVAS要素の親要素となるDIV要素の幅と高さをセット */
+	this.canvas.parentNode.style.width = this.canvas.width + "px";
+	this.canvas.parentNode.style.height = this.canvas.height + "px";
 };
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 * 描画
@@ -119,7 +123,7 @@ html5jp.graph.line.prototype.draw = function(items, inparams) {
 	}
 	cpos.w = cpos.x1 - cpos.x0;
 	cpos.h = cpos.y0 - cpos.y1;
-	/* 項目の数（最大10個）*/
+	/* 項目の数（最大10個） */
 	var item_num = items.length;
 	if(item_num > 10) { item_num = 10; }
 	/* 凡例の各種座標を算出 */
@@ -132,8 +136,8 @@ html5jp.graph.line.prototype.draw = function(items, inparams) {
 			y: Math.round( ( this.canvas.height - ( legend_tmp_s.h * item_num + legend_tmp_s.h * 0.2 * (item_num - 1) ) ) / 2 ),
 			h: legend_tmp_s.h
 		};
-		lpos.cx = lpos.x + Math.round( lpos.h * 2.5 ); // 文字表示開始位置(x座標)
-		lpos.cw = this.canvas.width - lpos.cx;       // 文字表示幅
+		lpos.cx = lpos.x + Math.round( lpos.h * 2.5 ); /* 文字表示開始位置(x座標) */
+		lpos.cw = this.canvas.width - lpos.cx;       /* 文字表示幅 */
 	}
 	/* グラフの背景を塗りつぶす */
 	if(params.gGradation == true) {

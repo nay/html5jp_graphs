@@ -1,5 +1,5 @@
-// Copyright 2007 futomi  http://www.html5.jp/
-// graph_vbar ver 1.0.1  2007-12-17
+// Copyright 2007-2009 futomi  http://www.html5.jp/
+// graph_vbar ver 1.0.4  2010-01-14
 // since 2007-10-17
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// vbar.js v1.0.4
 
 if( typeof html5jp == 'undefined' ) {
 	html5jp = new Object();
@@ -27,23 +29,28 @@ if( typeof html5jp.graph == 'undefined' ) {
 html5jp.graph.vbar = function (id) {
 	var elm = document.getElementById(id);
 	if(! elm) { return; }
-	if(elm.nodeName != "CANVAS") { return; }
-	if(elm.parentNode.nodeName != "DIV") { return; };
-	this.canvas = elm;
+	if( ! elm.nodeName.match(/^CANVAS$/i) ) { return; }
+	if( ! elm.parentNode.nodeName.match(/^DIV$/i) ) { return; };
 	/* CANVAS要素 */
-	if ( ! this.canvas ){ return; }
-	if ( ! this.canvas.getContext ){ return; }
+	if ( ! elm.getContext ){ return; }
+	this.canvas = elm;
 	/* 2D コンテクストの生成 */
 	this.ctx = this.canvas.getContext('2d');
 	this.canvas.style.margin = "0";
 	this.canvas.parentNode.style.position = "relative";
 	this.canvas.parentNode.style.padding = "0";
+	/* CANVAS要素の親要素となるDIV要素の幅と高さをセット */
+	this.canvas.parentNode.style.width = this.canvas.width + "px";
+	this.canvas.parentNode.style.height = this.canvas.height + "px";
 };
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 * 描画
 * ---------------------------------------------------------------- */
 html5jp.graph.vbar.prototype.draw = function(items, inparams) {
 	if( ! this.ctx ) {return;}
+	/* すでに描画した文字列を削除 */
+	this._reset();
+	/* */
 	this.items = items;
 	/* パラメータの初期化 */
 	var params = {
@@ -219,9 +226,15 @@ html5jp.graph.vbar.prototype.draw = function(items, inparams) {
 			/* 項目の値 */
 			var v = items[j][i];
 			/* 棒の底辺の位置 */
-			var y = cpos.y0 - sum * cpos.h / params.yMax;
+			var y = cpos.y0;
+			if(params.yMax > 0) {
+				y = cpos.y0 - sum * cpos.h / params.yMax;
+			}
 			/* 棒の高さ */
-			var h = v * cpos.h / params.yMax;
+			var h = 0;
+			if(params.yMax > 0) {
+				h = v * cpos.h / params.yMax;
+			}
 			/* 棒を描画 */
 			if( params.barShape == "line" ) {
 				this._draw_vertical_bar_line(this.ctx, x, y, h, cpos.r, params.barColors[j], params.barAlpha);
@@ -252,6 +265,20 @@ html5jp.graph.vbar.prototype.draw = function(items, inparams) {
 * ──────────────────────────────── */
 
 /* ------------------------------------------------------------------
+グラフをリセット
+* ---------------------------------------------------------------- */
+html5jp.graph.vbar.prototype._reset = function() {
+	var parent = this.canvas.parentNode;
+	var num = parent.childNodes.length;
+	for( var i=num-1; i>=0; i-- ) {
+		var nd = parent.childNodes.item(i);
+		if( /^canvas$/i.test( nd.nodeName ) ) { continue; }
+		parent.removeChild(nd);
+	}
+	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+};
+
+/* ------------------------------------------------------------------
 データラベルを描画
 * ---------------------------------------------------------------- */
 html5jp.graph.vbar.prototype._draw_data_label = function(labels) {
@@ -265,7 +292,10 @@ html5jp.graph.vbar.prototype._draw_data_label = function(labels) {
 		var s = this._getTextBoxSize(text, p.dLabelFontSize, p.dLabelFontFamily);
 		max_w = Math.max(s.w, max_w);
 		var dx = labels[i].x - s.w / 2;
-		var dy = p.cpos.y0 - labels[i].v * p.cpos.h / p.yMax - s.h * 1.3;
+		var dy = p.cpos.y0 - s.h * 1.3;
+		if(p.yMax > 0) {
+			dy = p.cpos.y0 - labels[i].v * p.cpos.h / p.yMax - s.h * 1.3;
+		}
 		pos.push( { x:dx, y:dy, text:text } );
 	}
 	if( max_w < p.cpos.w / n ) {
@@ -316,7 +346,7 @@ html5jp.graph.vbar.prototype._draw_legend = function() {
 		this.ctx.stroke();
 		this.ctx.restore();
 		/* グラデーション */
-		if( ! document.uniqueID && p.barGradation == true ) {
+		if( p.barGradation == true ) {
 			this.ctx.save();
 			this._make_path_legend_mark(lpos.x, lpos.y, s.h, s.h);
 			var grad = this.ctx.createLinearGradient(lpos.x, lpos.y, lpos.x+s.h, lpos.y+s.h);
@@ -397,11 +427,15 @@ html5jp.graph.vbar.prototype._draw_y_scale_label = function(pos) {
 	if( p.yScale == true && p.aLinePositions.length > 0 ) {
 		for( var i=0; i<p.aLinePositions.length; i++ ) {
 			var v = p.aLinePositions[i];
+			if( isNaN(v) ) { continue; }
 			if(v > p.yMax) { continue; }
 			var text = v.toString();
 			var s = this._getTextBoxSize(text, p.yScaleFontSize, p.yScaleFontFamily);
 			var x = p.cpos.x0 - p.cpos.r/2 - s.w*1.1;
-			var y = p.cpos.y0 - v * p.cpos.h / (p.yMax - p.yMin) - s.h/2;
+			var y = p.cpos.y0 - s.h/2;
+			if(p.yMax - p.yMin > 0) {
+				y = p.cpos.y0 - v * p.cpos.h / (p.yMax - p.yMin) - s.h/2;
+			}
 			if( p.barShape == "cylinder" || p.barShape == "square" ) {
 				var d = p.cpos.r / 3;
 				y += d;
@@ -493,6 +527,7 @@ html5jp.graph.vbar.prototype._draw_graph_background = function() {
 			this.ctx.save();
 			for( var i=0; i<p.aLinePositions.length; i++ ) {
 				if(p.aLinePositions[i] > p.yMax) { continue; }
+				if(p.yMax - p.yMin == 0) { continue; }
 				var aY = p.cpos.y0 -  p.cpos.h * p.aLinePositions[i] / ( p.yMax - p.yMin );
 				aY = Math.round(aY);
 				//
@@ -567,7 +602,6 @@ html5jp.graph.vbar.prototype._draw_graph_background_back = function(x, y, w, h) 
 		var grad = this.ctx.createLinearGradient(x, y-h, x+w, y);
 		grad.addColorStop(0, "rgba(0, 0, 0, 0.1)");
 		grad.addColorStop(0.3, "rgba(255, 255, 255, 0.2)");
-		if(document.uniqueID ) { grad.addColorStop(0.5, "rgba(255, 255, 255, 0.2)"); }
 		grad.addColorStop(1, "rgba(0, 0, 0, 0.3)");
 		this.ctx.fillStyle = grad;
 		this.ctx.beginPath();
@@ -576,9 +610,7 @@ html5jp.graph.vbar.prototype._draw_graph_background_back = function(x, y, w, h) 
 		this.ctx.lineTo(x+w, y-h);
 		this.ctx.lineTo(x, y-h);
 		this.ctx.closePath();
-		if(document.uniqueID ) { this.ctx.globalAlpha = 0.3; }
 		this.ctx.fill();
-		if(document.uniqueID ) { this.ctx.globalAlpha = 1; }
 		this.ctx.restore();
 	}
 	/* 補助線 */
@@ -586,6 +618,7 @@ html5jp.graph.vbar.prototype._draw_graph_background_back = function(x, y, w, h) 
 		this.ctx.save();
 		for( var i=0; i<p.aLinePositions.length; i++ ) {
 			if(p.aLinePositions[i] > p.yMax) { continue; }
+			if(p.yMax - p.yMin == 0) { continue; }
 			var aY = y -  h * p.aLinePositions[i] / ( p.yMax - p.yMin );
 			aY = Math.round(aY);
 			//
@@ -823,15 +856,9 @@ html5jp.graph.vbar.prototype._draw_vertical_bar_square = function(ctx, x, y, h, 
 		/* 正面 */
 		ctx.save();
 		var grad = ctx.createLinearGradient(p.f.tl.x, p.f.tl.y, p.f.br.x, p.f.br.y);
-		if(document.uniqueID) {
-			grad.addColorStop(0, color);
-			grad.addColorStop(0.3, "rgba(255, 255, 255, 0.1)");
-			grad.addColorStop(1, color);
-		} else {
-			grad.addColorStop(0, "rgba(0, 0, 0, 0.1)");
-			grad.addColorStop(0.3, "rgba(255, 255, 255, 0.1)");
-			grad.addColorStop(1, "rgba(0, 0, 0, 0.4)");
-		}
+		grad.addColorStop(0, "rgba(0, 0, 0, 0.1)");
+		grad.addColorStop(0.3, "rgba(255, 255, 255, 0.1)");
+		grad.addColorStop(1, "rgba(0, 0, 0, 0.4)");
 		ctx.fillStyle = grad;
 		ctx.beginPath();
 		ctx.moveTo(p.f.tl.x, p.f.tl.y);
@@ -839,21 +866,14 @@ html5jp.graph.vbar.prototype._draw_vertical_bar_square = function(ctx, x, y, h, 
 		ctx.lineTo(p.f.br.x, p.f.br.y);
 		ctx.lineTo(p.f.bl.x, p.f.bl.y);
 		ctx.closePath();
-		if(document.uniqueID) { ctx.globalAlpha = 0; }
 		ctx.fill();
-		if(document.uniqueID) { ctx.globalAlpha = 1; }
 		ctx.restore();
 		/* 右側面 */
 		ctx.save();
-		if(document.uniqueID ) {
-			ctx.fillStyle = "#000000";
-			ctx.globalAlpha = 0.4;
-		} else {
-			var grad3 = ctx.createLinearGradient(p.f.tr.x, p.f.tr.y, p.b.tr.x, p.f.tr.y);
-			grad3.addColorStop(0, "rgba(0, 0, 0, 0.3)");
-			grad3.addColorStop(1, "rgba(0, 0, 0, 0.5)");
-			ctx.fillStyle = grad3;
-		}
+		var grad3 = ctx.createLinearGradient(p.f.tr.x, p.f.tr.y, p.b.tr.x, p.f.tr.y);
+		grad3.addColorStop(0, "rgba(0, 0, 0, 0.3)");
+		grad3.addColorStop(1, "rgba(0, 0, 0, 0.5)");
+		ctx.fillStyle = grad3;
 		ctx.beginPath();
 		ctx.moveTo(p.f.tr.x, p.f.tr.y);
 		ctx.lineTo(p.b.tr.x, p.b.tr.y);
@@ -865,13 +885,8 @@ html5jp.graph.vbar.prototype._draw_vertical_bar_square = function(ctx, x, y, h, 
 		/* 上面 */
 		ctx.save();
 		var grad2 = ctx.createLinearGradient(x-xr/5, y-h+yr, x+xr/5, y-h-yr);
-		if(document.uniqueID) {
-			grad2.addColorStop(0, "rgba(255, 255, 255, 0.2)");
-			grad2.addColorStop(1, color);
-		} else {
-			grad2.addColorStop(0, "rgba(255, 255, 255, 0.2)");
-			grad2.addColorStop(1, "rgba(0, 0, 0, 0.1)");
-		}
+		grad2.addColorStop(0, "rgba(255, 255, 255, 0.2)");
+		grad2.addColorStop(1, "rgba(0, 0, 0, 0.1)");
 		ctx.fillStyle = grad2;
 		ctx.beginPath();
 		ctx.moveTo(p.f.tl.x, p.f.tl.y);
@@ -879,9 +894,7 @@ html5jp.graph.vbar.prototype._draw_vertical_bar_square = function(ctx, x, y, h, 
 		ctx.lineTo(p.b.tr.x, p.b.tr.y);
 		ctx.lineTo(p.b.tl.x, p.b.tl.y);
 		ctx.closePath();
-		if(document.uniqueID ) { ctx.globalAlpha = 0.1; }
 		ctx.fill();
-		if(document.uniqueID ) { ctx.globalAlpha = 1; }
 		ctx.restore();
 	} else {
 		/* 側面 */
@@ -996,15 +1009,9 @@ html5jp.graph.vbar.prototype._draw_vertical_bar_flat = function(ctx, x, y, h, xr
 		ctx.save();
 		ctx.lineWidth = 1;
 		var grad = ctx.createLinearGradient(x-xr, y-h, x+xr, y);
-		if(document.uniqueID ) {
-			grad.addColorStop(0, color);
-			grad.addColorStop(0.3, "rgba(255, 255, 255, 0.1)");
-			grad.addColorStop(1, color);
-		} else {
-			grad.addColorStop(0, "rgba(0, 0, 0, 0.1)");
-			grad.addColorStop(0.3, "rgba(255, 255, 255, 0.1)");
-			grad.addColorStop(1, "rgba(0, 0, 0, 0.4)");
-		}
+		grad.addColorStop(0, "rgba(0, 0, 0, 0.1)");
+		grad.addColorStop(0.3, "rgba(255, 255, 255, 0.1)");
+		grad.addColorStop(1, "rgba(0, 0, 0, 0.4)");
 		ctx.fillStyle = grad;
 		ctx.beginPath();
 		ctx.moveTo(x-xr+2, y-2);
@@ -1012,9 +1019,7 @@ html5jp.graph.vbar.prototype._draw_vertical_bar_flat = function(ctx, x, y, h, xr
 		ctx.lineTo(x+xr-2, y-h+2);
 		ctx.lineTo(x-xr+2, y-h+2);
 		ctx.closePath();
-		if(document.uniqueID) { ctx.globalAlpha = 0; }
 		ctx.fill();
-		if(document.uniqueID) { ctx.globalAlpha = 1; }
 		ctx.restore();
 	}
 };
@@ -1095,16 +1100,9 @@ html5jp.graph.vbar.prototype._draw_vertical_bar_cylinder = function(ctx, x, y, h
 		/* 側面 */
 		ctx.save();
 		var grad1 = ctx.createLinearGradient(x-xr, y, x+xr, y);
-		if(document.uniqueID) {
-			grad1.addColorStop(0, color);
-			grad1.addColorStop(0.4, "rgba(255, 255, 255, 0.3)");
-			grad1.addColorStop(0.9, color);
-			grad1.addColorStop(1, color);
-		} else {
-			grad1.addColorStop(0, "rgba(0, 0, 0, 0.1)");
-			grad1.addColorStop(0.4, "rgba(255, 255, 255, 0.3)");
-			grad1.addColorStop(1, "rgba(0, 0, 0, 0.3)");
-		}
+		grad1.addColorStop(0, "rgba(0, 0, 0, 0.1)");
+		grad1.addColorStop(0.4, "rgba(255, 255, 255, 0.3)");
+		grad1.addColorStop(1, "rgba(0, 0, 0, 0.3)");
 		ctx.fillStyle = grad1;
 		ctx.beginPath();
 		ctx.moveTo(x+xr, y);
@@ -1114,20 +1112,13 @@ html5jp.graph.vbar.prototype._draw_vertical_bar_cylinder = function(ctx, x, y, h
 		ctx.bezierCurveTo(x-xr, y-h+yr/2, x-xr/2, y-h+yr, x, y-h+yr);
 		ctx.bezierCurveTo(x+xr/2, y-h+yr, x+xr, y-h+yr/2, x+xr, y-h);
 		ctx.lineTo(x+xr, y);
-		if(document.uniqueID ) { ctx.globalAlpha = 0; }
 		ctx.fill();
-		if(document.uniqueID ) { ctx.globalAlpha = 1; }
 		ctx.restore();
 		/* 上面 */
 		ctx.save();
 		var grad2 = ctx.createLinearGradient(x-xr/5, y-h+yr, x+xr/5, y-h-yr);
-		if(document.uniqueID) {
-			grad2.addColorStop(0, "rgba(255, 255, 255, 0.2)");
-			grad2.addColorStop(1, color);
-		} else {
-			grad2.addColorStop(0, "rgba(255, 255, 255, 0.2)");
-			grad2.addColorStop(1, "rgba(0, 0, 0, 0.1)");
-		}
+		grad2.addColorStop(0, "rgba(255, 255, 255, 0.2)");
+		grad2.addColorStop(1, "rgba(0, 0, 0, 0.1)");
 		ctx.fillStyle = grad2;
 		ctx.beginPath();
 		ctx.moveTo(x-xr, y-h);
@@ -1135,9 +1126,7 @@ html5jp.graph.vbar.prototype._draw_vertical_bar_cylinder = function(ctx, x, y, h
 		ctx.bezierCurveTo(x+xr/2, y-h-yr, x+xr, y-h-yr/2, x+xr, y-h);
 		ctx.bezierCurveTo(x+xr, y-h+yr/2, x+xr/2, y-h+yr, x, y-h+yr);
 		ctx.bezierCurveTo(x-xr/2, y-h+yr, x-xr, y-h+yr/2, x-xr, y-h);
-		if(document.uniqueID ) { ctx.globalAlpha = 0; }
 		ctx.fill();
-		if(document.uniqueID ) { ctx.globalAlpha = 1; }
 		ctx.restore();
 	} else {
 		/* 上面 */
